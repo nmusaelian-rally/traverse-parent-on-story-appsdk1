@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- Copyright (c) 2010 Rally Software Development Corp. All rights reserved -->
+<html>
+<head>
+   <title>Table Component Example</title>
+   <meta name="Name" content="App example of how to traverse Parent attribute on a story" />
+   <meta name="Version" content="2010.4" />
+   <meta name="Vendor" content="Rally Labs" />
+   <script type="text/javascript" src="https://rally1.rallydev.com/apps/1.31/sdk.js"></script>
+   <script type="text/javascript">
+
+     function tableExample() {
+       var rallyDataSource = new rally.sdk.data.RallyDataSource('12352608129', '12352608219',false, false);  //USE YOUR OIDs
+       var howFarBack = rally.sdk.util.DateTime.add(new Date(), "week", -4);  //4 weeks back. 
+       var howFarBackISO = rally.sdk.util.DateTime.toIsoString(howFarBack);
+      function itemQuery() {
+         var queryObject = {
+           key: 'stories',
+           type: 'HierarchicalRequirement',
+           fetch: 'FormattedID,Name,ScheduleState,Parent,Project',
+	   query: '(LastUpdateDate > "' + howFarBackISO + '")'
+         };
+         rallyDataSource.findAll(queryObject, populateTable);
+      }
+
+      function populateTable(results) {
+         var tableDiv = document.getElementById('aDiv');
+         var config = { columns:
+             [{key: 'FormattedID', header: 'Formatted ID', width: 100},
+             {key: 'Name'},
+             {key: 'ScheduleState', header: 'Schedule State'},
+	     {key: 'Parent.Name', header: 'Parent'},
+             {key: 'Parent.Project.Name', header: 'Project of Parent'}] };
+        var table = new rally.sdk.ui.Table(config);
+         table.addRows(results.stories);
+         table.display(tableDiv);
+
+      };
+      itemQuery();
+     }
+
+     rally.addOnLoad(tableExample);
+   </script>
+</head>
+<body>
+   <div id="aDiv"></div>
+</body>
+</html> 
